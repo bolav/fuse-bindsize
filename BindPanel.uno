@@ -9,67 +9,68 @@ using Fuse.Elements;
 using Fuse.Scripting;
 using Fuse.Triggers;
 
-public class Float2ChangedArgs: ValueChangedArgs<float2>, IScriptEvent
-{
-	public Float2ChangedArgs(float2 value, object origin): base(value, origin)
-	{
-	}
-
-	void IScriptEvent.Serialize(IEventSerializer s)
-	{
-		s.AddDouble("Value", Value.X);
-		// s.AddDouble("Y", Value.Y);
-	}
-}
-
-
 public class BindPanel : Panel {
 
-	public static readonly StyleProperty<BindPanel, float2> SizeProperty
-		= new StyleProperty<BindPanel, float2>(float2(0,0), null, SetSize, GetSize);
+	public static readonly StyleProperty<BindPanel, float> SizeXProperty
+		= new StyleProperty<BindPanel, float>(0.0F, null, SetSizeX, GetSizeX);
+
+	public static readonly StyleProperty<BindPanel, float> SizeYProperty
+		= new StyleProperty<BindPanel, float>(0.0F, null, SetSizeY, GetSizeY);
 
 	// public event SizeChangedHandler<float2> SizeChanged;
 
 	float2 _size = float2(5,5);
-	[Group("Common"), UXValueChangedEvent("SetSize", "SizeChanged"), UXContent]
-	public float2 Size
+	public float SizeX
 	{
-		get { return _size; }
+		get { return _size.X; }
 		set { 
-			debug_log "Size.set: " + value;
-			SizeProperty.Set(this, value);
+			debug_log "SizeX.set: " + value;
+			SizeXProperty.Set(this, value);
+		}
+	}
+	public float SizeY
+	{
+		get { return _size.Y; }
+		set { 
+			debug_log "SizeY.set: " + value;
+			SizeYProperty.Set(this, value);
 		}
 	}
 
-	static float2 GetSize(BindPanel p)
+
+	static float GetSizeX(BindPanel p)
 	{
-		debug_log "static GetSize " + p._size;
-		return p._size;
+		debug_log "static GetSizeX " + p._size;
+		return p._size.X;
 	}
-	static void SetSize(BindPanel p, float2 size)
+	static float GetSizeY(BindPanel p)
 	{
-		debug_log "static SetSize " + size;
-		p._size = size;
-		p.OnSizeChanged(size, null);
+		debug_log "static GetSizeY " + p._size;
+		return p._size.Y;
 	}
-	public void SetSize(float2 size, object origin)
+	static void SetSizeX(BindPanel p, float sizeX)
 	{
-		debug_log "dynamic SetSize " + size;
-		_size = size;
-		SizeProperty.SetLocalState(this);
-		OnSizeChanged(size, origin);
+		debug_log "static SetSizeX " + sizeX;
+		p._size.X = sizeX;
+	}
+	static void SetSizeY(BindPanel p, float sizeY)
+	{
+		debug_log "static SetSizeY " + sizeY;
+		p._size.Y = sizeY;
 	}
 
-	public event ValueChangedHandler<float2> SizeChanged;
+	public void SetSizeX(float sizeX, object origin)
+	{
+		debug_log "dynamic SetSizeX " + sizeX;
+		_size.X = sizeX;
+		SizeXProperty.SetLocalState(this);
+	}
 
-	protected void OnSizeChanged(float2 newSize, object origin) {
-		if (SizeChanged != null)
-		{
-			debug_log "Dynamic Size change";
-			var args = new Float2ChangedArgs(newSize, origin);
-			debug_log "Running sizechanged " + SizeChanged;
-			SizeChanged(this, args);
-		}
+	public void SetSizeY(float sizeY, object origin)
+	{
+		debug_log "dynamic SetSizeY " + sizeY;
+		_size.Y = sizeY;
+		SizeYProperty.SetLocalState(this);
 	}
 
 	public override void InvalidateVisual()
@@ -83,7 +84,10 @@ public class BindPanel : Panel {
 			debug_log "now: " + ActualSize;
 			// Size = ActualSize;
 			// OnSizeChanged(ActualSize, this);
-			SetSize(ActualSize, this);
+			// SetSizeX(ActualSize.X, this);
+			// SetSizeY(ActualSize.Y, this);
+			SizeX = ActualSize.X;
+			SizeY = ActualSize.Y;
 			debug_log "aft: " + _size;
 		}
 		// debug_log "InvalidateVisual: " + ActualSize;

@@ -1,18 +1,21 @@
 <App Theme="Basic">
 	<JavaScript>
 		var Observable = require('FuseJS/Observable');
-		var size = Observable([0,0]);
+		var sizex = Observable(0);
+		var sizey = Observable(0);
 
 		function c () {
-			debug_log("s: " + size.value);
+			debug_log("x: " + sizex);
+			debug_log("y: " + sizey);
 		} 
 
 		module.exports = {
-			size: size,
+			sizex: sizex,
+			sizey: sizey,
 			c: c
 		}	
 	</JavaScript>
-	<BindPanel Size="{size}">
+	<BindPanel SizeX="{sizex}" SizeY="{sizey}">
 		<Button Text="Click me" Clicked="{c}" />
 	</BindPanel>
 </App>
