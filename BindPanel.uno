@@ -9,38 +9,35 @@ using Fuse.Elements;
 using Fuse.Scripting;
 using Fuse.Triggers;
 
+public class Float2ChangedArgs: ValueChangedArgs<float2>, IScriptEvent
+{
+	public Float2ChangedArgs(float2 value, object origin): base(value, origin)
+	{
+	}
+
+	void IScriptEvent.Serialize(IEventSerializer s)
+	{
+		s.AddDouble("Value", Value.X);
+		// s.AddDouble("Y", Value.Y);
+	}
+}
+
+
 public class BindPanel : Panel {
 
 	public static readonly StyleProperty<BindPanel, float2> SizeProperty
-		= new StyleProperty<BindPanel, float2>(float2(0,0), OnSizePropertyChanged);
-		// = new StyleProperty<BindPanel, float2>(float2(0,0), null, SetSize, GetSize);
+		= new StyleProperty<BindPanel, float2>(float2(0,0), null, SetSize, GetSize);
 
 	// public event SizeChangedHandler<float2> SizeChanged;
 
-	public event EventHandler SizePropertyChanged;
-
-	protected static void OnSizePropertyChanged(BindPanel p)
-	{
-		debug_log "Static Size Change";
-		p.OnSizePropertyChanged();
-	}
-
-
-	protected void OnSizePropertyChanged()
-	{
-		debug_log "Dynamic Size change";
-		if (SizePropertyChanged != null)
-			SizePropertyChanged(this, EventArgs.Empty);
-	}
-
-
 	float2 _size = float2(5,5);
+	[Group("Common"), UXValueChangedEvent("SetSize", "SizeChanged"), UXContent]
 	public float2 Size
 	{
 		get { return _size; }
 		set { 
 			debug_log "Size.set: " + value;
-			SizeProperty.Set(this, value); // This should be disabled for readonly
+			SizeProperty.Set(this, value);
 		}
 	}
 
@@ -51,27 +48,43 @@ public class BindPanel : Panel {
 	}
 	static void SetSize(BindPanel p, float2 size)
 	{
-		debug_log "static SetSize";
+		debug_log "static SetSize " + size;
 		p._size = size;
-		// t.OnSizeChanged(value, null);
+		p.OnSizeChanged(size, null);
 	}
 	public void SetSize(float2 size, object origin)
 	{
 		debug_log "dynamic SetSize " + size;
-		SizeProperty.SetLocalState(this);
-		SizeProperty.Set(this, size); // This should be disabled for readonly
 		_size = size;
-		// debug_log("Setting sp: " + size);
-		// OnSizeChanged(size, origin);
+		SizeProperty.SetLocalState(this);
+		OnSizeChanged(size, origin);
+	}
+
+	public event ValueChangedHandler<float2> SizeChanged;
+
+	protected void OnSizeChanged(float2 newSize, object origin) {
+		if (SizeChanged != null)
+		{
+			debug_log "Dynamic Size change";
+			var args = new Float2ChangedArgs(newSize, origin);
+			debug_log "Running sizechanged " + SizeChanged;
+			SizeChanged(this, args);
+		}
 	}
 
 	public override void InvalidateVisual()
 	{
+		debug_log "";
+		debug_log "------ STARTING --------";
+		debug_log "old: " + _size;
+
 		base.InvalidateVisual();
 		if (_size != ActualSize) {
 			debug_log "now: " + ActualSize;
-			OnSizePropertyChanged();
-			Size = ActualSize;
+			// Size = ActualSize;
+			// OnSizeChanged(ActualSize, this);
+			SetSize(ActualSize, this);
+			debug_log "aft: " + _size;
 		}
 		// debug_log "InvalidateVisual: " + ActualSize;
 		// SetSize(ActualSize, this);

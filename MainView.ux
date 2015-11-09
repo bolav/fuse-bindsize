@@ -1,18 +1,19 @@
 <App Theme="Basic">
 	<JavaScript>
-		var SP = require('SizePanel');
-		
+		var Observable = require('FuseJS/Observable');
+		var size = Observable([0,0]);
+
 		function c () {
-			debug_log("h: " + SP.GetHeightJS());
-			debug_log("w: " + SP.GetWidthJS());
+			debug_log("s: " + size.value);
 		} 
 
 		module.exports = {
+			size: size,
 			c: c
 		}	
 	</JavaScript>
-	<SizePanel>
+	<BindPanel Size="{size}">
 		<Button Text="Click me" Clicked="{c}" />
-	</SizePanel>
+	</BindPanel>
 </App>
 
