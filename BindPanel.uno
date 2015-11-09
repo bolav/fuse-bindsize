@@ -11,66 +11,12 @@ using Fuse.Triggers;
 
 public class BindPanel : Panel {
 
-	public static readonly StyleProperty<BindPanel, float> SizeXProperty
-		= new StyleProperty<BindPanel, float>(0.0F, null, SetSizeX, GetSizeX);
-
-	public static readonly StyleProperty<BindPanel, float> SizeYProperty
-		= new StyleProperty<BindPanel, float>(0.0F, null, SetSizeY, GetSizeY);
-
-	// public event SizeChangedHandler<float2> SizeChanged;
-
 	float2 _size = float2(5,5);
-	public float SizeX
-	{
-		get { return _size.X; }
+	public float2 Size {
+		get { return _size; }
 		set { 
-			debug_log "SizeX.set: " + value;
-			SizeXProperty.Set(this, value);
-		}
-	}
-	public float SizeY
-	{
-		get { return _size.Y; }
-		set { 
-			debug_log "SizeY.set: " + value;
-			SizeYProperty.Set(this, value);
-		}
-	}
-
-
-	static float GetSizeX(BindPanel p)
-	{
-		debug_log "static GetSizeX " + p._size;
-		return p._size.X;
-	}
-	static float GetSizeY(BindPanel p)
-	{
-		debug_log "static GetSizeY " + p._size;
-		return p._size.Y;
-	}
-	static void SetSizeX(BindPanel p, float sizeX)
-	{
-		debug_log "static SetSizeX " + sizeX;
-		p._size.X = sizeX;
-	}
-	static void SetSizeY(BindPanel p, float sizeY)
-	{
-		debug_log "static SetSizeY " + sizeY;
-		p._size.Y = sizeY;
-	}
-
-	public void SetSizeX(float sizeX, object origin)
-	{
-		debug_log "dynamic SetSizeX " + sizeX;
-		_size.X = sizeX;
-		SizeXProperty.SetLocalState(this);
-	}
-
-	public void SetSizeY(float sizeY, object origin)
-	{
-		debug_log "dynamic SetSizeY " + sizeY;
-		_size.Y = sizeY;
-		SizeYProperty.SetLocalState(this);
+			debug_log "Setting size " + value;
+			_size = value; }
 	}
 
 	public override void InvalidateVisual()
@@ -82,32 +28,18 @@ public class BindPanel : Panel {
 		base.InvalidateVisual();
 		if (_size != ActualSize) {
 			debug_log "now: " + ActualSize;
-			// Size = ActualSize;
-			// OnSizeChanged(ActualSize, this);
-			// SetSizeX(ActualSize.X, this);
-			// SetSizeY(ActualSize.Y, this);
-			SizeX = ActualSize.X;
-			SizeY = ActualSize.Y;
+			Size = ActualSize;
 			debug_log "aft: " + _size;
+			foreach (var b in Behaviors) {
+				debug_log "b: " + b;
+				if (b is Fuse.Reactive.DataBinding<float2>) {
+					var db = b as Fuse.Reactive.DataBinding<float2>;
+					debug_log "Is a DataBinding";
+					db.SetValue(ActualSize);
+				}
+			}
 		}
-		// debug_log "InvalidateVisual: " + ActualSize;
-		// SetSize(ActualSize, this);
-		// debug_log "size: " + _size;
-		// debug_log "sp.get: " + SizeProperty.Get(this);
-		// SizeProperty.Set(this, ActualSize);
 	}
-
-	/* 
-	protected void OnSizeChanged(float2 newSize, object origin)
-	{
-		if (SizeChanged != null)
-		{
-			// var args = new StringChangedArgs(newString, origin);
-			SizeChanged(this, null);
-		}
-	}*/
-
-
 
 
 }
