@@ -7,7 +7,7 @@
 		function c () {
 			debug_log("x: " + sizex);
 			debug_log("y: " + sizey);
-		} 
+		}
 
 		module.exports = {
 			sizex: sizex,
