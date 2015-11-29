@@ -1,25 +1,24 @@
 <App Theme="Basic">
 	<JavaScript>
-		var Observable = require('FuseJS/Observable');
-		var sizex = Observable(0);
-		var sizey = Observable(0);
-		var size = Observable([0,0]);
-
-		function c () {
-			debug_log("x: " + sizex);
-			debug_log("y: " + sizey);
-			debug_log("s: " + size);
+		var SP = require('SizePanel');
+		debug_log(SP);
+		debug_log(JSON.stringify(SP));
+		SP.doit = function () {
+			return 55;
 		}
+		
+		function c () {
+			debug_log("h: " + SP.GetHeightJS());
+			debug_log("w: " + SP.GetWidthJS());
+			debug_log("d: " + SP.doit());
+		} 
 
 		module.exports = {
-			sizex: sizex,
-			sizey: sizey,
-			size: size,
 			c: c
 		}	
 	</JavaScript>
-	<BindPanel Size="{size}">
+	<SizePanel>
 		<Button Text="Click me" Clicked="{c}" />
-	</BindPanel>
+	</SizePanel>
 </App>
 

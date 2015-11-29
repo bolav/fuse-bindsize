@@ -35,7 +35,7 @@ public class BindPanel : Panel {
 				if (b is Fuse.Reactive.DataBinding<float2>) {
 					var db = b as Fuse.Reactive.DataBinding<float2>;
 					debug_log "Is a DataBinding";
-					db.SetValue(ActualSize);
+					// db.SetValue(ActualSize);
 				}
 			}
 		}
